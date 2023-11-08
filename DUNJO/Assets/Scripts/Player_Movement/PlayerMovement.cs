@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -42,6 +44,7 @@ public class PlayerMovement : MonoBehaviour
     //respawn and death variables
     Vector2 CheckpointPos;//players starting position(Edit: Changed to checkpoint position, its only starting pos at the start of the game)
 
+    
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer;
@@ -55,8 +58,10 @@ public class PlayerMovement : MonoBehaviour
 
     // private void Awake()
     // {
-    //     AudioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    //     //AudioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
     // }
+
+  
 
     //video follwed for death and respawn https://www.youtube.com/watch?v=odStG_LfPMQ&ab_channel=RehopeGames
     
@@ -97,8 +102,6 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
 
-        
-        
         horizontal = Input.GetAxisRaw("Horizontal");
 
         if(IsGrounded())
@@ -116,10 +119,10 @@ public class PlayerMovement : MonoBehaviour
             doubleJump = false;
         }
 
-        if (!doubleJump) 
-        {
+        // if (!doubleJump) 
+        // {
             
-        }
+        // }
 
         if (Input.GetButtonDown("Jump")) 
         {

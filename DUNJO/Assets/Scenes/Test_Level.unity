@@ -298,6 +298,7 @@ GameObject:
   - component: {fileID: 356130261}
   - component: {fileID: 356130260}
   - component: {fileID: 356130258}
+  - component: {fileID: 356130262}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -381,11 +382,20 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 356130255}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: acf038420eeb5d047a3cede6635b439a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speed: 8
+  jumpingPower: 16
+  coyoteTime: 0.2
+  WallSlidingSpeed: 2
+  wallJumpingTime: 0.2
+  wallJumpingDuration: 0.4
+  dashingPower: 24
+  dashingTime: 0.2
+  dashingCooldown: 1
   rb: {fileID: 356130259}
   groundCheck: {fileID: 2116179207}
   groundLayer:
@@ -410,8 +420,8 @@ Rigidbody2D:
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 4
+  m_AngularDrag: 0
+  m_GravityScale: 25
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -581,6 +591,20 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &356130262
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 356130255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 722f83b5ef0d96640aa0b4bc647975c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 356130259}
+  speed: 12
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -688,7 +712,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 10
+  orthographic size: 12
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
