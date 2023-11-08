@@ -5,20 +5,20 @@ using UnityEngine.InputSystem;
 
 public class NEWPlayerMovement : MonoBehaviour
 {
-    [SerializeField] public Rigidbody2D rb;
+    [Header("Component Links")]
+    [SerializeField] private Rigidbody2D rb;
     public Transform groundCheck;
     public LayerMask groundLayer;
 
-    private float coyoteTime = 0.2f;
-    private float coyoteTimeCounter;
-
-    private float jumpBufferTime = 0.2f;
-    private float jumpBufferCounter;
-
-    private float horizontal;
-    private bool doubleJump;
+    [Header("Jump Settings")]
     [SerializeField] private float speed = 8f;
     [SerializeField] private float jumpingPower = 16f;
+    [SerializeField] private float coyoteTime = 0.2f;
+    [SerializeField] private float coyoteTimeCounter;
+    [SerializeField] private float jumpBufferTime = 0.2f;
+    [SerializeField] private float jumpBufferCounter;
+    private float horizontal;
+    private bool doubleJump;
     private bool isFacingRight = true;
 
     void Update()
@@ -40,7 +40,7 @@ public class NEWPlayerMovement : MonoBehaviour
 
     public void Jump(InputAction.CallbackContext context)
     {
-        if(IsGrounded() && !context.performed)
+        if(IsGrounded())
         {
             coyoteTimeCounter = coyoteTime;
             doubleJump = false;
