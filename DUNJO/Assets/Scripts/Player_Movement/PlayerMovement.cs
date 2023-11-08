@@ -9,12 +9,12 @@ public class PlayerMovement : MonoBehaviour
     //public Animator animator;
     //basic movement and jump variables (Video Reference/Guide Follow: https://www.youtube.com/watch?v=K1xZ-rycYY8)
     private float horizontal;
-    private float speed = 8f;
-    private float jumpingPower = 16f;
+    [SerializeField] private float speed = 8f;
+    [SerializeField] private float jumpingPower = 16f;
     private bool isFacingRight = true;
 
     //coyote Time Variables(Video Reference/Guide Follow:https://www.youtube.com/watch?v=RFix_Kg2Di0&t=55s)
-    private float coyoteTime = 0.2f;//the higher the value the longer u have coyote time
+    [SerializeField] private float coyoteTime = 0.2f;//the higher the value the longer u have coyote time
     private float coyoteTimeCounter;
 
     //double jump variables (Video Reference/Guide Follow: https://www.youtube.com/watch?v=RdhgngSUco0)
@@ -22,20 +22,22 @@ public class PlayerMovement : MonoBehaviour
 
     //Wall slide and jump Variables (Video Reference/Guide Follow: https://www.youtube.com/watch?v=O6VX6Ro7EtA)
     private bool isWallSliding;//indicadtes wall climbing
-    private float WallSlidingSpeed = 2f;
+    [SerializeField] private float WallSlidingSpeed = 2f;
     private bool isWallJumping;//indicates if player is wall jumping
     private float WallJumpingDirection;//wall jumping direction
-    private float wallJumpingTime = 0.2f;//time wall jumping
+    [SerializeField] private float wallJumpingTime = 0.2f;//time wall jumping
     private float wallJumpingCounter;//wall jump counter
-    private float wallJumpingDuration = 0.4f;//wall jumping duration
+    [SerializeField] private float wallJumpingDuration = 0.4f;//wall jumping duration
     private Vector2 wallJumpingPower = new Vector2(8f, 16f);//power of wall jump
+    private SpriteRenderer playerSprite;
+    private Color ogPlayerColour;
 
     //dash variables (Video Reference/Guide Follow: https://www.youtube.com/watch?v=2kFGmuPHiA0)
     private bool canDash = true;//determines if player can dash
     private bool isDashing;//determines if player is already dashing
-    private float dashingPower = 24f;//dashing power
-    private float dashingTime = 0.2f;//time spent dashing
-    private float dashingCooldown = 1f;//cooldown of dash ability
+    [SerializeField] private float dashingPower = 24f;//dashing power
+    [SerializeField] private float dashingTime = 0.2f;//time spent dashing
+    [SerializeField] private float dashingCooldown = 1f;//cooldown of dash ability
 
     //respawn and death variables
     Vector2 CheckpointPos;//players starting position(Edit: Changed to checkpoint position, its only starting pos at the start of the game)
@@ -46,6 +48,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private TrailRenderer tr;
     [SerializeField] private Transform wallcheck;
     [SerializeField] private LayerMask wallLayer;
+
+    
 
     // AudioManager AudioManager;
 
@@ -61,6 +65,8 @@ public class PlayerMovement : MonoBehaviour
     {
         CheckpointPos = transform.position;
         rb = GetComponent<Rigidbody2D>();
+        playerSprite = GetComponent<SpriteRenderer>();
+        ogPlayerColour = playerSprite.color;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -91,10 +97,7 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
 
-        if (isDashing)
-        {
-            return;
-        }
+        
         
         horizontal = Input.GetAxisRaw("Horizontal");
 
@@ -111,6 +114,11 @@ public class PlayerMovement : MonoBehaviour
         {
             //AudioManager.PlaySFX(AudioManager.Jump);
             doubleJump = false;
+        }
+
+        if (!doubleJump) 
+        {
+            
         }
 
         if (Input.GetButtonDown("Jump")) 
@@ -234,6 +242,7 @@ public class PlayerMovement : MonoBehaviour
     {
         canDash = false;
         isDashing = true;
+        playerSprite.color = new Color(playerSprite.color.r * 4, playerSprite.color.g * 2, playerSprite.color.b * 2);
         float originalGravity = rb.gravityScale;//this is because we dont want our player to be affected by gravity while dashing
         rb.gravityScale = 0f;//variable that stores gravity since we want to apply concept above^
         rb.velocity = new Vector2(transform.localScale.x * dashingPower, 0f);//indicates direction player is facing
@@ -244,5 +253,6 @@ public class PlayerMovement : MonoBehaviour
         isDashing = false;//we cant dash
         yield return new WaitForSeconds(dashingCooldown);//waits for a few seconds(correspondng to dashing cooldown)
         canDash = true;//sets can dash back to true afterwards
+        playerSprite.color = ogPlayerColour;
     }
 }
