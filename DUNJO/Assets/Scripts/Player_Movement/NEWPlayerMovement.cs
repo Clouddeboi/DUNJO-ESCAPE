@@ -5,49 +5,93 @@ using UnityEngine.InputSystem;
 
 public class NEWPlayerMovement : MonoBehaviour
 {
-    private CustomInput inputs = null;
-    private Vector2 moveVector = Vector2.zero;
-    [SerializeField] private Rigidbody2D rb;
+    [SerializeField] public Rigidbody2D rb;
+    public Transform groundCheck;
+    public LayerMask groundLayer;
+
+    private float coyoteTime = 0.2f;
+    private float coyoteTimeCounter;
+
+    private float jumpBufferTime = 0.2f;
+    private float jumpBufferCounter;
+
+    private float horizontal;
+    private bool doubleJump;
     [SerializeField] private float speed = 8f;
-   
+    [SerializeField] private float jumpingPower = 16f;
+    private bool isFacingRight = true;
 
-    private void Awake()
+    void Update()
     {
-        inputs = new CustomInput();
-        rb = GetComponent<Rigidbody2D>();
-    }
-
-    private void OnEnable()
-    {
-        inputs.Enable();
-        inputs.Player.Movement.performed += OnMovementPerformed;
-        inputs.Player.Movement.canceled += OnMovementCancelled;
-    }
-
-    private void OnDisable()
-    {
-        inputs.Disable();
-        inputs.Player.Movement.performed -= OnMovementPerformed;
-        inputs.Player.Movement.canceled -= OnMovementCancelled;
-    }
-
-    private void Update()
-    {
-
+        if (!isFacingRight && horizontal > 0f)
+        {
+            Flip();
+        }
+        else if (isFacingRight && horizontal < 0f)
+        {
+            Flip();
+        }
     }
 
     private void FixedUpdate()
     {
-        rb.velocity = moveVector * speed;
+        rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
     }
 
-    private void OnMovementPerformed(InputAction.CallbackContext value)
+    public void Jump(InputAction.CallbackContext context)
     {
-        moveVector = value.ReadValue<Vector2>();
+        if(IsGrounded() && !context.performed)
+        {
+            coyoteTimeCounter = coyoteTime;
+            doubleJump = false;
+        }
+        else
+        {
+            coyoteTimeCounter -= Time.deltaTime;
+        }
+
+        if(context.performed)
+        {
+            jumpBufferCounter = jumpBufferTime;
+        }
+        else
+        {
+            jumpBufferCounter -= Time.deltaTime;
+        }
+
+            if (jumpBufferCounter > 0f && coyoteTimeCounter > 0f || jumpBufferCounter > 0f && doubleJump)
+            {
+                rb.velocity = new Vector2(rb.velocity.x, jumpingPower);
+
+                jumpBufferCounter = 0f;
+
+                doubleJump = !doubleJump;
+            }
+
+            if (context.canceled && rb.velocity.y > 0f)
+            {
+                rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+
+                coyoteTimeCounter = 0f;
+            }
     }
 
-    private void OnMovementCancelled(InputAction.CallbackContext value)
+    private bool IsGrounded()
     {
-        moveVector = Vector2.zero;
+        return Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+    }
+
+    private void Flip()
+    {
+        isFacingRight = !isFacingRight;
+        Vector3 localScale = transform.localScale;
+        localScale.x *= -1f;
+        transform.localScale = localScale;
+    }
+
+    public void Move(InputAction.CallbackContext context)
+    {
+        horizontal = context.ReadValue<Vector2>().x;
     }
 }
+
