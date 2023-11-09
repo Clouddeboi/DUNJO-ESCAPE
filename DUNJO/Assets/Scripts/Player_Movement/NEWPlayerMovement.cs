@@ -6,7 +6,8 @@ using UnityEngine.Rendering;
 
 public class NEWPlayerMovement : MonoBehaviour
 {
-    [SerializeField] public Rigidbody2D rb;
+    [Header("Component Links")]
+    [SerializeField] private Rigidbody2D rb;
     public Transform groundCheck;
     public LayerMask groundLayer;
 
@@ -18,6 +19,9 @@ public class NEWPlayerMovement : MonoBehaviour
 
     private float horizontal;
     private bool doubleJump;
+
+    [Header("Jump Settings")]
+
     [SerializeField] private float speed = 8f;
     [SerializeField] private float jumpingPower = 16f;
     private bool isFacingRight = true;
@@ -79,7 +83,7 @@ public class NEWPlayerMovement : MonoBehaviour
 
     public void Jump(InputAction.CallbackContext context)
     {
-        if(IsGrounded() && !context.performed)
+        if(IsGrounded())
         {
             coyoteTimeCounter = coyoteTime;
             doubleJump = false;
