@@ -18,27 +18,27 @@ public class NEWPlayerMovement : MonoBehaviour
     private float jumpBufferCounter;
 
     private float horizontal;
-    private bool doubleJump;
 
     [Header("Jump Settings")]
 
     [SerializeField] private float speed = 8f;
     [SerializeField] private float jumpingPower = 16f;
-    private bool isFacingRight = true;
-
-    private bool canDash = true;//determines if player can dash
-    private bool isDashing;//determines if player is already dashing
     [SerializeField] private float dashingPower = 24f;//dashing power
     [SerializeField] private float dashingTime = 0.2f;//time spent dashing
     [SerializeField] private float dashingCooldown = 1f;//cooldown of dash ability
     [SerializeField] private TrailRenderer tr;
 
+    [Header ("Booleans")]
+    [SerializeField] private bool isWallSliding;//indicadtes wall climbing
+    [SerializeField] private bool isWallJumping;//indicates if player is wall jumping
+    [SerializeField] private bool canDash = true;//determines if player can dash
+    [SerializeField] private bool isFacingRight = true;
+    [SerializeField] private bool isDashing;//determines if player is already dashing
+    [SerializeField] private bool canDoubleJump;
+    
     private SpriteRenderer playerSprite;
     private Color ogPlayerColour;
-
-    private bool isWallSliding;//indicadtes wall climbing
     [SerializeField] private float WallSlidingSpeed = 2f;
-    private bool isWallJumping;//indicates if player is wall jumping
     private float WallJumpingDirection;//wall jumping direction
     [SerializeField] private float wallJumpingTime = 0.2f;//time wall jumping
     private float wallJumpingCounter;//wall jump counter
@@ -56,6 +56,7 @@ public class NEWPlayerMovement : MonoBehaviour
 
     void Update()
     {
+
         if (!isFacingRight && horizontal > 0f)
         {
             Flip();
@@ -71,11 +72,14 @@ public class NEWPlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (IsGrounded()) {
+            canDoubleJump = true;
+        }
 
-            if (isDashing)
-            {
-                return;
-            }
+        if (isDashing)
+        {
+            return;
+        }
 
         rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
         
@@ -86,7 +90,7 @@ public class NEWPlayerMovement : MonoBehaviour
         if(IsGrounded())
         {
             coyoteTimeCounter = coyoteTime;
-            doubleJump = false;
+            canDoubleJump = false;
         }
         else
         {
@@ -102,28 +106,28 @@ public class NEWPlayerMovement : MonoBehaviour
             jumpBufferCounter -= Time.deltaTime;
         }
 
-            if ((jumpBufferCounter > 0f && coyoteTimeCounter > 0f) || (jumpBufferCounter > 0f && doubleJump) || (jumpBufferCounter > 0f && IsWalled()))
+        if ((jumpBufferCounter > 0f && coyoteTimeCounter > 0f) || (jumpBufferCounter > 0f && canDoubleJump) || (jumpBufferCounter > 0f && IsWalled()))
+        {
+            //using iswalled() makes it so that you just have to be next to wall to refresh jump
+            //using iswallsliding makes it so you have to hold direction into wall to refresh jump
+            if (IsWalled() && wallJumpingCounter > 0f) 
             {
-                //using iswalled() makes it so that you just have to be next to wall to refresh jump
-                //using iswallsliding makes it so you have to hold direction into wall to refresh jump
-                if (IsWalled() && wallJumpingCounter > 0f) 
-                {
-                    WallJump();
-                }
-
-                rb.velocity = new Vector2(rb.velocity.x, jumpingPower);
-
-                jumpBufferCounter = 0f;
-
-                doubleJump = !doubleJump;
+                WallJump();
             }
 
-            if (context.canceled && rb.velocity.y > 0f)
-            {
-                rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+            rb.velocity = new Vector2(rb.velocity.x, jumpingPower);
 
-                coyoteTimeCounter = 0f;
-            }
+            jumpBufferCounter = 0f;
+
+            canDoubleJump = !canDoubleJump;
+        }
+
+        if (context.canceled && rb.velocity.y > 0f)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+
+            coyoteTimeCounter = 0f;
+        }
     }
 
     private bool IsGrounded()
@@ -211,7 +215,7 @@ public class NEWPlayerMovement : MonoBehaviour
         {
             //Audio goes here
             isWallJumping = true;
-            doubleJump = true;//this is so we can double jump off the walls
+            canDoubleJump = true;//this is so we can double jump off the walls
             rb.velocity = new Vector2(WallJumpingDirection * wallJumpingPower.x, wallJumpingPower.y);
             wallJumpingCounter = 0f;//prevents spamming jump button
 
