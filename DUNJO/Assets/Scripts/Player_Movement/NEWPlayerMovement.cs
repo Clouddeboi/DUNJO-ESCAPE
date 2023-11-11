@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+//using System.Numerics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
@@ -38,16 +39,20 @@ public class NEWPlayerMovement : MonoBehaviour
     
     private SpriteRenderer playerSprite;
     private Color ogPlayerColour;
-    [SerializeField] private float WallSlidingSpeed = 2f;
     private float WallJumpingDirection;//wall jumping direction
     [SerializeField] private float wallJumpingTime = 0.2f;//time wall jumping
     private float wallJumpingCounter;//wall jump counter
     [SerializeField] private float wallJumpingDuration = 0.4f;//wall jumping duration
     private Vector2 wallJumpingPower = new Vector2(8f, 16f);//power of wall jump
+    
 
     [SerializeField] private Transform wallcheck;
     [SerializeField] private LayerMask wallLayer;
+    [SerializeField] private float WallSlidingSpeed = 2f;
 
+    public float baseGravity = 2f;
+    public float maxFallSpeed = 18f;
+    public float fallGravityMult = 2f;
     private void Start()
     {
         playerSprite = GetComponent<SpriteRenderer>();
@@ -65,8 +70,16 @@ public class NEWPlayerMovement : MonoBehaviour
         {
             Flip();
         }
+        ProcessWallSlide();
+        //ProcessGravity();
+        ProcessWallJump();
 
-        WallSlide();
+        if(!isWallJumping)
+        {
+            rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
+            Flip();
+        }
+
 
     }
 
@@ -81,7 +94,7 @@ public class NEWPlayerMovement : MonoBehaviour
             return;
         }
 
-        rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
+        //rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
         
     }
 
@@ -110,10 +123,6 @@ public class NEWPlayerMovement : MonoBehaviour
         {
             //using iswalled() makes it so that you just have to be next to wall to refresh jump
             //using iswallsliding makes it so you have to hold direction into wall to refresh jump
-            if (IsWalled() && wallJumpingCounter > 0f) 
-            {
-                WallJump();
-            }
 
             rb.velocity = new Vector2(rb.velocity.x, jumpingPower);
 
@@ -128,6 +137,23 @@ public class NEWPlayerMovement : MonoBehaviour
 
             coyoteTimeCounter = 0f;
         }
+
+        if(context.performed && wallJumpingCounter > 0f)
+        {
+            isWallJumping = true;
+            rb.velocity = new Vector2(WallJumpingDirection * wallJumpingPower.x, wallJumpingPower.y);
+            wallJumpingCounter = 0;
+
+            if(transform.localScale.x != WallJumpingDirection)
+            {
+                isFacingRight = !isFacingRight;
+                Vector3 localScale = transform.localScale;
+                localScale.x *= -1f;
+                transform.localScale = localScale;
+            }
+
+            Invoke(nameof(CancelWallJump), wallJumpingTime + 0.1f);
+        }
     }
 
     private bool IsGrounded()
@@ -135,24 +161,59 @@ public class NEWPlayerMovement : MonoBehaviour
         return Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
     }
 
+    // private void ProcessGravity()
+    // {
+    //     if(rb.velocity.y < 0)
+    //     {
+    //         rb.gravityScale = baseGravity * fallGravityMult;
+    //         rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y, -maxFallSpeed));
+    //     }
+    //     else
+    //     {
+    //         rb.gravityScale = baseGravity;
+    //     }
+    // }
+  
+    
+    private void ProcessWallSlide()
+    {
+        if(!IsGrounded() && IsWalled() && horizontal != 0)
+        {
+            isWallSliding = true;
+            rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y, -WallSlidingSpeed));
+        }
+        else
+        {
+            isWallSliding = false;
+        }
+    }
+
+    private void CancelWallJump()
+    {
+        isWallJumping = false;
+    }
+
+    private void ProcessWallJump()
+    {
+        if(isWallSliding)
+        {   
+            isWallJumping = false;
+            WallJumpingDirection = -transform.localScale.x;
+            wallJumpingCounter = wallJumpingTime;
+
+            CancelInvoke(nameof(CancelWallJump));
+        }
+        else if(wallJumpingCounter > 0f)
+        {
+            wallJumpingCounter -= Time.deltaTime;
+        }
+    }
+    
     private bool IsWalled()
     {
         return Physics2D.OverlapCircle(wallcheck.position, 0.2f, wallLayer);//checks if the player is colliding with a wall     
     }
 
-    private void WallSlide()
-   {
-        if(IsWalled() && !IsGrounded() && horizontal != 0f)//if we arent on the ground and we are at a wall set wall sliding to true
-        {
-            isWallSliding = true;
-            rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -WallSlidingSpeed, float.MaxValue));
-           
-        }
-        else 
-        {
-            isWallSliding = false;//else set to false
-        }
-   }
 
     private void Flip()
     {
@@ -195,45 +256,5 @@ public class NEWPlayerMovement : MonoBehaviour
         playerSprite.color = ogPlayerColour;
     }
 
-    //WHERE DOES THE ARC JUMP THING GO? Where the player is pushed away from the wall and can't influence direction
-    //Doesnt it have to be a coroutine in here somewhere?
-    private void WallJump()
-   {
-        if(isWallSliding)
-        {
-            isWallJumping = false;//if we are wall sliding we are not wall jumping
-            WallJumpingDirection = -transform.localScale.x;//flips the direction that the player is facing
-            wallJumpingCounter = wallJumpingTime;
-            CancelInvoke(nameof(StopWallJumping));//cancels method if player is wall sliding
-        }
-        else
-        {
-            wallJumpingCounter -= Time.deltaTime;
-        }
-
-        if(wallJumpingCounter > 0f)
-        {
-            //Audio goes here
-            isWallJumping = true;
-            canDoubleJump = true;//this is so we can double jump off the walls
-            rb.velocity = new Vector2(WallJumpingDirection * wallJumpingPower.x, wallJumpingPower.y);
-            wallJumpingCounter = 0f;//prevents spamming jump button
-
-            if(transform.localScale.x != WallJumpingDirection)//flips player to face direction of movement
-            {
-                isFacingRight = !isFacingRight;
-                Vector3 localScale = transform.localScale;
-                localScale.x *= -1f;
-                transform.localScale = localScale;
-            }
-
-            Invoke(nameof(StopWallJumping), wallJumpingDuration);//invoke method with a delay
-        }
-   }
-
-   private void StopWallJumping()
-   {
-        isWallJumping = false;
-   }
 }
 
