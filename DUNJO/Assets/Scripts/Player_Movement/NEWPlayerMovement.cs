@@ -102,8 +102,15 @@ public class NEWPlayerMovement : MonoBehaviour
             jumpBufferCounter -= Time.deltaTime;
         }
 
-            if (jumpBufferCounter > 0f && coyoteTimeCounter > 0f || jumpBufferCounter > 0f && doubleJump)
+            if ((jumpBufferCounter > 0f && coyoteTimeCounter > 0f) || (jumpBufferCounter > 0f && doubleJump) || (jumpBufferCounter > 0f && IsWalled()))
             {
+                //using iswalled() makes it so that you just have to be next to wall to refresh jump
+                //using iswallsliding makes it so you have to hold direction into wall to refresh jump
+                if (IsWalled() && wallJumpingCounter > 0f) 
+                {
+                    WallJump();
+                }
+
                 rb.velocity = new Vector2(rb.velocity.x, jumpingPower);
 
                 jumpBufferCounter = 0f;
@@ -183,5 +190,46 @@ public class NEWPlayerMovement : MonoBehaviour
         canDash = true;//sets can dash back to true afterwards
         playerSprite.color = ogPlayerColour;
     }
+
+    //WHERE DOES THE ARC JUMP THING GO? Where the player is pushed away from the wall and can't influence direction
+    //Doesnt it have to be a coroutine in here somewhere?
+    private void WallJump()
+   {
+        if(isWallSliding)
+        {
+            isWallJumping = false;//if we are wall sliding we are not wall jumping
+            WallJumpingDirection = -transform.localScale.x;//flips the direction that the player is facing
+            wallJumpingCounter = wallJumpingTime;
+            CancelInvoke(nameof(StopWallJumping));//cancels method if player is wall sliding
+        }
+        else
+        {
+            wallJumpingCounter -= Time.deltaTime;
+        }
+
+        if(wallJumpingCounter > 0f)
+        {
+            //Audio goes here
+            isWallJumping = true;
+            doubleJump = true;//this is so we can double jump off the walls
+            rb.velocity = new Vector2(WallJumpingDirection * wallJumpingPower.x, wallJumpingPower.y);
+            wallJumpingCounter = 0f;//prevents spamming jump button
+
+            if(transform.localScale.x != WallJumpingDirection)//flips player to face direction of movement
+            {
+                isFacingRight = !isFacingRight;
+                Vector3 localScale = transform.localScale;
+                localScale.x *= -1f;
+                transform.localScale = localScale;
+            }
+
+            Invoke(nameof(StopWallJumping), wallJumpingDuration);//invoke method with a delay
+        }
+   }
+
+   private void StopWallJumping()
+   {
+        isWallJumping = false;
+   }
 }
 
