@@ -580,20 +580,35 @@ MonoBehaviour:
     m_Bits: 192
   coyoteTime: 0.2
   jumpBufferTime: 0.2
-  speed: 15
-  jumpingPower: 30
-  dashingPower: 30
+  horizontal: 0
+  speed: 20
+  jumpingPower: 32
+  dashingPower: 32
   dashingTime: 0.2
-  dashingCooldown: 1
+  dashingCooldown: 0.8
   tr: {fileID: 356130260}
   WallSlidingSpeed: 2
   wallJumpingTime: 0.2
+  wallJumpingCounter: 0
+  cannotTurnForTimer: 0
   wallJumpingDuration: 0.4
-  wallJumpingPower: {x: 20, y: 20}
+  wallJumpingPower: {x: 20, y: 30}
   wallcheck: {fileID: 277923729}
   wallLayer:
     serializedVersion: 2
     m_Bits: 128
+  stopTime: 0.1
+  gravityScale: 10
+  isWallSliding: 0
+  isWallJumping: 0
+  isFacingRight: 1
+  canDash: 1
+  isDashing: 0
+  doubleJump: 0
+  doGroundPound: 0
+  dropForce: 50
+  isGrounded: 0
+  isWalled: 0
 --- !u!114 &356130263
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -667,6 +682,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 7c582e86-526b-4dff-ac0d-d97e7d45dfc0
     m_ActionName: Player/New action
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 356130262}
+        m_TargetAssemblyTypeName: NEWPlayerMovement, Assembly-CSharp
+        m_MethodName: GroundPound
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: e0713008-0f32-4c2a-bad5-5e40e1e672e1
+    m_ActionName: Player/GroundPound[/XInputControllerWindows/buttonEast,/Keyboard/f]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player

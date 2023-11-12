@@ -34,6 +34,8 @@ public class NEWPlayerMovement : MonoBehaviour
     [SerializeField] private Transform wallcheck;
     [SerializeField] private LayerMask wallLayer;
     private float wallJumpingDirection;
+    [SerializeField] private float stopTime = 0.5f;
+    [SerializeField] private float gravityScale = 1f;
 
     [Header ("Booleans")]
     [SerializeField] private bool isWallSliding;//indicates wall climbing
@@ -42,6 +44,8 @@ public class NEWPlayerMovement : MonoBehaviour
     [SerializeField] private bool canDash = true;//determines if player can dash
     [SerializeField] private bool isDashing;//determines if player is already dashing
     [SerializeField] private bool doubleJump;
+    [SerializeField] private bool doGroundPound;
+    [SerializeField] private float dropForce = 5f;
     /* MAYBE DELETE THESE AFTER? */[SerializeField] private bool isGrounded;
     /* MAYBE DELETE THESE AFTER? */[SerializeField] private bool isWalled;
 
@@ -91,6 +95,20 @@ public class NEWPlayerMovement : MonoBehaviour
                 return;
             }
             rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
+
+            if(doGroundPound)
+            {
+                GroundPoundAttack();
+            }
+            doGroundPound = false;
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if(other.contacts[0].normal.y > 0.5)
+        {
+            CompleteGroundPound();
         }
     }
 
@@ -215,6 +233,47 @@ public void Move(InputAction.CallbackContext context)
             Flip();
         }
     }
+}
+
+public void GroundPound(InputAction.CallbackContext context)
+{
+    if(context.performed)
+    {
+        if(!IsGrounded())
+        {
+            doGroundPound = true;
+        }
+    }
+}
+
+private void GroundPoundAttack()
+{
+    StopAndSpin();
+    StartCoroutine("DropAndSmash");
+}
+
+private void StopAndSpin()
+{
+    ClearForces();  
+    rb.gravityScale = 0;
+    //we can change how we freeze our position here 
+}
+
+private IEnumerator DropAndSmash()
+{
+    yield return new WaitForSeconds(stopTime);
+    rb.AddForce(Vector2.down * dropForce, ForceMode2D.Impulse);
+}
+
+private void CompleteGroundPound()
+{
+    rb.gravityScale = gravityScale;
+}
+
+private void ClearForces()
+{
+    rb.velocity = Vector2.zero;
+    rb.angularVelocity = 0;
 }
 
     public void Dash(InputAction.CallbackContext context)
