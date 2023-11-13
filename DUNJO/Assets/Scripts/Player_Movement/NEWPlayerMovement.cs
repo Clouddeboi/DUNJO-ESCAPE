@@ -41,7 +41,7 @@ public class NEWPlayerMovement : MonoBehaviour
     [SerializeField] private bool isFacingRight = true;
     [SerializeField] public bool canDash = true;//determines if player can dash
     [SerializeField] public bool isDashing;//determines if player is already dashing
-    [SerializeField] private bool doubleJump;
+    [SerializeField] public bool doubleJump;
     /* MAYBE DELETE THESE AFTER? */[SerializeField] private bool isGrounded;
     /* MAYBE DELETE THESE AFTER? */[SerializeField] private bool isWalled;
 

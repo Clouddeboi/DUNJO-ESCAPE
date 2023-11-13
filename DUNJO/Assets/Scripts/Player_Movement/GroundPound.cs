@@ -62,6 +62,7 @@ public class GroundPound : MonoBehaviour
     {
         isGroundpounding = true;
         pm.canDash = false;
+        pm.doubleJump = false;
         ClearForces();  
         rb.gravityScale = 0;
         //we can change how we freeze our position here 
@@ -79,6 +80,7 @@ public class GroundPound : MonoBehaviour
         pm.enabled = true;
         isGroundpounding = false;
         pm.canDash = true;
+        pm.doubleJump = true;
     }
 
     private void ClearForces()
