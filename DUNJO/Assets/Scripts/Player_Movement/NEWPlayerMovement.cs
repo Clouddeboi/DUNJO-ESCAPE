@@ -10,43 +10,40 @@ public class NEWPlayerMovement : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     public Transform groundCheck;
     public LayerMask groundLayer;
-
     [SerializeField]private float coyoteTime = 0.2f;
     private float coyoteTimeCounter;
-
     [SerializeField] private float jumpBufferTime = 0.2f;
     private float jumpBufferCounter;
-
-    private float horizontal;
-    private bool doubleJump;
+    [SerializeField]private float horizontal;
 
     [Header("Jump Settings")]
-
     [SerializeField] private float speed = 8f;
-    [SerializeField] private float jumpingPower = 16f;
-    private bool isFacingRight = true;
-
-    private bool canDash = true;//determines if player can dash
-    private bool isDashing;//determines if player is already dashing
-    [SerializeField] private float dashingPower = 24f;//dashing power
+    [SerializeField] private float jumpingPower = 30f;
+    [SerializeField] private float dashingPower = 20f;//dashing power
     [SerializeField] private float dashingTime = 0.2f;//time spent dashing
     [SerializeField] private float dashingCooldown = 1f;//cooldown of dash ability
     [SerializeField] private TrailRenderer tr;
-
     private SpriteRenderer playerSprite;
     private Color ogPlayerColour;
-
-    private bool isWallSliding;//indicadtes wall climbing
     [SerializeField] private float WallSlidingSpeed = 2f;
-    private bool isWallJumping;//indicates if player is wall jumping
-    private float WallJumpingDirection;//wall jumping direction
     [SerializeField] private float wallJumpingTime = 0.2f;//time wall jumping
-    private float wallJumpingCounter;//wall jump counter
+    [SerializeField] private float wallJumpingCounter;//wall jump counter
+    [SerializeField] private float cannotTurnForTimer = 0f; //Timer that counts down from wallJumpingTime, once at 0f the player can do input
     [SerializeField] private float wallJumpingDuration = 0.4f;//wall jumping duration
-    private Vector2 wallJumpingPower = new Vector2(8f, 16f);//power of wall jump
-
+    [SerializeField] private Vector2 wallJumpingPower = new Vector2(8f, 16f);//power of wall jump
     [SerializeField] private Transform wallcheck;
     [SerializeField] private LayerMask wallLayer;
+    private float wallJumpingDirection;
+
+    [Header ("Booleans")]
+    [SerializeField] private bool isWallSliding;//indicates wall climbing
+    [SerializeField] public bool isWallJumping;//indicates if player is wall jumping
+    [SerializeField] private bool isFacingRight = true;
+    [SerializeField] public bool canDash = true;//determines if player can dash
+    [SerializeField] public bool isDashing;//determines if player is already dashing
+    [SerializeField] private bool doubleJump;
+    /* MAYBE DELETE THESE AFTER? */[SerializeField] private bool isGrounded;
+    /* MAYBE DELETE THESE AFTER? */[SerializeField] private bool isWalled;
 
     private void Start()
     {
@@ -56,30 +53,48 @@ public class NEWPlayerMovement : MonoBehaviour
 
     void Update()
     {
-        if (!isFacingRight && horizontal > 0f)
-        {
-            Flip();
-        }
-        else if (isFacingRight && horizontal < 0f)
-        {
-            Flip();
-        }
-
         WallSlide();
-
     }
 
     private void FixedUpdate()
     {
+        if (!isFacingRight && horizontal > 0f && cannotTurnForTimer <= 0f)
+        {
+            Flip();
+        }
+        else if (isFacingRight && horizontal < 0f && cannotTurnForTimer <= 0f)
+        {
+            Flip();
+        }
 
+        if(IsGrounded())
+        {
+            doubleJump = true;
+            isWallJumping = false;
+            wallJumpingCounter = 0f;
+            cannotTurnForTimer = 0f;
+        }
+
+        else {
+            cannotTurnForTimer -= Time.deltaTime;
+        }
+        
+        if(!isWallSliding && wallJumpingCounter > 0f)
+        {
+            Flip();
+        }
+
+        if (!isWallJumping)
+        {
             if (isDashing)
             {
                 return;
             }
-
-        rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
-        
+            rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
+        }
     }
+
+
 
     public void Jump(InputAction.CallbackContext context)
     {
@@ -102,30 +117,64 @@ public class NEWPlayerMovement : MonoBehaviour
             jumpBufferCounter -= Time.deltaTime;
         }
 
-            if (jumpBufferCounter > 0f && coyoteTimeCounter > 0f || jumpBufferCounter > 0f && doubleJump)
-            {
-                rb.velocity = new Vector2(rb.velocity.x, jumpingPower);
+        if (jumpBufferCounter > 0f && coyoteTimeCounter > 0f || jumpBufferCounter > 0f && doubleJump)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, jumpingPower);
 
-                jumpBufferCounter = 0f;
+            jumpBufferCounter = 0f;
 
-                doubleJump = !doubleJump;
+            doubleJump = !doubleJump;
+        }
+
+        if (context.canceled && rb.velocity.y > 0f)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+
+            coyoteTimeCounter = 0f;
+        }
+        
+        if (isWallSliding)
+        {
+            
+            isWallJumping = false;
+            wallJumpingDirection = -transform.localScale.x;
+            wallJumpingCounter = wallJumpingTime;
+            cannotTurnForTimer = wallJumpingDuration;
+
+            CancelInvoke(nameof(StopWallJumping));
+        }
+        else
+        {
+            wallJumpingCounter -= Time.deltaTime;
+        }
+
+        if (context.performed && wallJumpingCounter > 0f)
+        {
+            if (isWallSliding) {
+                Flip();
             }
 
-            if (context.canceled && rb.velocity.y > 0f)
-            {
-                rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+            isWallJumping = true;
+            rb.velocity = new Vector2(wallJumpingDirection * wallJumpingPower.x, wallJumpingPower.y);
+            wallJumpingCounter = 0f;
 
-                coyoteTimeCounter = 0f;
-            }
+            Invoke(nameof(StopWallJumping), wallJumpingDuration);
+        }
     }
 
-    private bool IsGrounded()
+    private void StopWallJumping()
     {
+        isWallJumping = false;
+    }
+    public bool IsGrounded()
+    {
+        /* MAYBE DELETE THESE AFTER? */isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
         return Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
     }
 
     private bool IsWalled()
     {
+        /* MAYBE DELETE THESE AFTER? */isWalled = Physics2D.OverlapCircle(wallcheck.position, 0.2f, wallLayer);
         return Physics2D.OverlapCircle(wallcheck.position, 0.2f, wallLayer);//checks if the player is colliding with a wall     
     }
 
@@ -135,7 +184,6 @@ public class NEWPlayerMovement : MonoBehaviour
         {
             isWallSliding = true;
             rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -WallSlidingSpeed, float.MaxValue));
-           
         }
         else 
         {
@@ -151,10 +199,27 @@ public class NEWPlayerMovement : MonoBehaviour
         transform.localScale = localScale;
     }
 
-    public void Move(InputAction.CallbackContext context)
+public void Move(InputAction.CallbackContext context)
+{
+    horizontal = context.ReadValue<Vector2>().x;
+
+    if (horizontal > 0f)
     {
-        horizontal = context.ReadValue<Vector2>().x;
+        if (!isFacingRight)
+        {
+            Flip();
+        }
     }
+    else if (horizontal < 0f)
+    {
+        if (isFacingRight)
+        {
+            Flip();
+        }
+    }
+}
+
+
 
     public void Dash(InputAction.CallbackContext context)
     {
