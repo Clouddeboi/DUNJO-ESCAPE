@@ -7,7 +7,8 @@ using UnityEngine.Rendering;
 public class NEWPlayerMovement : MonoBehaviour
 {
     [Header("Component Links")]
-    [SerializeField] private Rigidbody2D rb;
+    public Dash dash; //Dash Script
+    public Rigidbody2D rb;
     public Transform groundCheck;
     public LayerMask groundLayer;
     [SerializeField]private float coyoteTime = 0.2f;
@@ -19,12 +20,8 @@ public class NEWPlayerMovement : MonoBehaviour
     [Header("Jump Settings")]
     [SerializeField] private float speed = 8f;
     [SerializeField] private float jumpingPower = 30f;
-    [SerializeField] private float dashingPower = 20f;//dashing power
-    [SerializeField] private float dashingTime = 0.2f;//time spent dashing
-    [SerializeField] private float dashingCooldown = 1f;//cooldown of dash ability
-    [SerializeField] private TrailRenderer tr;
-    private SpriteRenderer playerSprite;
-    private Color ogPlayerColour;
+    public SpriteRenderer playerSprite;
+    public Color ogPlayerColour;
     [SerializeField] private float WallSlidingSpeed = 2f;
     [SerializeField] private float wallJumpingTime = 0.2f;//time wall jumping
     [SerializeField] private float wallJumpingCounter;//wall jump counter
@@ -39,16 +36,20 @@ public class NEWPlayerMovement : MonoBehaviour
     [SerializeField] private bool isWallSliding;//indicates wall climbing
     [SerializeField] public bool isWallJumping;//indicates if player is wall jumping
     [SerializeField] private bool isFacingRight = true;
-    [SerializeField] public bool canDash = true;//determines if player can dash
-    [SerializeField] public bool isDashing;//determines if player is already dashing
     [SerializeField] public bool doubleJump;
     /* MAYBE DELETE THESE AFTER? */[SerializeField] private bool isGrounded;
     /* MAYBE DELETE THESE AFTER? */[SerializeField] private bool isWalled;
 
-    private void Start()
+    private void Awake()
     {
+        dash = GetComponent<Dash>();
         playerSprite = GetComponent<SpriteRenderer>();
         ogPlayerColour = playerSprite.color;
+    }
+
+    private void Start()
+    {
+        
     }
 
     void Update()
@@ -86,7 +87,7 @@ public class NEWPlayerMovement : MonoBehaviour
 
         if (!isWallJumping)
         {
-            if (isDashing)
+            if (dash.isDashing)
             {
                 return;
             }
@@ -199,54 +200,25 @@ public class NEWPlayerMovement : MonoBehaviour
         transform.localScale = localScale;
     }
 
-public void Move(InputAction.CallbackContext context)
-{
-    horizontal = context.ReadValue<Vector2>().x;
-
-    if (horizontal > 0f)
+    public void Move(InputAction.CallbackContext context)
     {
-        if (!isFacingRight)
+        horizontal = context.ReadValue<Vector2>().x;
+
+        if (horizontal > 0f)
         {
-            Flip();
+            if (!isFacingRight)
+            {
+                Flip();
+            }
+        }
+        else if (horizontal < 0f)
+        {
+            if (isFacingRight)
+            {
+                Flip();
+            }
         }
     }
-    else if (horizontal < 0f)
-    {
-        if (isFacingRight)
-        {
-            Flip();
-        }
-    }
-}
 
-
-
-    public void Dash(InputAction.CallbackContext context)
-    {
-        if (canDash)
-        {
-            //AudioManager.PlaySFX(AudioManager.Dash);
-            StartCoroutine(Dash());
-        }
-
-    }
-
-    private IEnumerator Dash()
-    {
-        canDash = false;
-        isDashing = true;
-        playerSprite.color = new Color(playerSprite.color.r * 4, playerSprite.color.g * 2, playerSprite.color.b * 2);
-        float originalGravity = rb.gravityScale;//this is because we dont want our player to be affected by gravity while dashing
-        rb.gravityScale = 0f;//variable that stores gravity since we want to apply concept above^
-        rb.velocity = new Vector2(transform.localScale.x * dashingPower, 0f);//indicates direction player is facing
-        tr.emitting = true;//emits trail
-        yield return new WaitForSeconds(dashingTime);//stop dashing for a few secs
-        tr.emitting = false;//trail emitting off
-        rb.gravityScale = originalGravity;//sets gravity back to original
-        isDashing = false;//we cant dash
-        yield return new WaitForSeconds(dashingCooldown);//waits for a few seconds(correspondng to dashing cooldown)
-        canDash = true;//sets can dash back to true afterwards
-        playerSprite.color = ogPlayerColour;
-    }
 }
 
