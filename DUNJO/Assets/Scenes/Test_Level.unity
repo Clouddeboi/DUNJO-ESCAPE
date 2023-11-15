@@ -299,6 +299,8 @@ GameObject:
   - component: {fileID: 356130260}
   - component: {fileID: 356130262}
   - component: {fileID: 356130264}
+  - component: {fileID: 356130267}
+  - component: {fileID: 356130266}
   - component: {fileID: 356130263}
   m_Layer: 0
   m_Name: Player
@@ -574,20 +576,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 722f83b5ef0d96640aa0b4bc647975c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  GP: {fileID: 0}
+  dash: {fileID: 0}
+  J: {fileID: 0}
   rb: {fileID: 356130259}
   groundCheck: {fileID: 2116179207}
   groundLayer:
     serializedVersion: 2
     m_Bits: 192
+  playerSprite: {fileID: 0}
+  ogPlayerColour: {r: 0.65882355, g: 0.34509805, b: 0.10980393, a: 0}
+  isFacingRight: 1
+  isGrounded: 0
   coyoteTime: 0.2
+  coyoteTimeCounter: 0
   jumpBufferTime: 0.2
+  jumpBufferCounter: 0
+  jumpingPower: 32
+  doubleJump: 0
   horizontal: 0
   speed: 20
-  jumpingPower: 32
-  dashingPower: 32
-  dashingTime: 0.2
-  dashingCooldown: 0.8
-  tr: {fileID: 356130260}
   WallSlidingSpeed: 2
   wallJumpingTime: 0.2
   wallJumpingCounter: 0
@@ -598,14 +606,20 @@ MonoBehaviour:
   wallLayer:
     serializedVersion: 2
     m_Bits: 128
+  wallJumpingDirection: 0
   isWallSliding: 0
   isWallJumping: 0
-  isFacingRight: 1
+  isWalled: 0
   canDash: 1
   isDashing: 0
-  doubleJump: 0
-  isGrounded: 0
-  isWalled: 0
+  dashingPower: 40
+  dashingTime: 0.2
+  dashingCooldown: 1
+  tr: {fileID: 356130260}
+  doGroundPound: 0
+  dropForce: 45
+  stopTime: 0.1
+  gravityScale: 10
 --- !u!114 &356130263
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -649,9 +663,9 @@ MonoBehaviour:
     m_ActionName: Player/Movement[/Keyboard/a,/Keyboard/d,/Keyboard/leftArrow,/Keyboard/rightArrow,/XInputControllerWindows/leftStick/left,/XInputControllerWindows/leftStick/right,/XInputControllerWindows/dpad/left,/XInputControllerWindows/dpad/right]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 356130262}
-        m_TargetAssemblyTypeName: NEWPlayerMovement, Assembly-CSharp
-        m_MethodName: Jump
+      - m_Target: {fileID: 356130266}
+        m_TargetAssemblyTypeName: Jump, Assembly-CSharp
+        m_MethodName: JumpButton
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -665,9 +679,9 @@ MonoBehaviour:
     m_ActionName: Player/Jump[/Keyboard/space,/Keyboard/upArrow]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 356130262}
-        m_TargetAssemblyTypeName: NEWPlayerMovement, Assembly-CSharp
-        m_MethodName: Dash
+      - m_Target: {fileID: 356130267}
+        m_TargetAssemblyTypeName: Dash, Assembly-CSharp
+        m_MethodName: doDash
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -713,10 +727,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 356130259}
-  doGroundPound: 0
-  dropForce: 50
-  stopTime: 0.1
-  gravityScale: 10
+  isGroundpounding: 0
+--- !u!114 &356130266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 356130255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3e9e10e0c56f5142af506fd9e5259af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 356130259}
+--- !u!114 &356130267
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 356130255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58c4dccd66d50e545881ad25b7e2acdf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 356130259}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

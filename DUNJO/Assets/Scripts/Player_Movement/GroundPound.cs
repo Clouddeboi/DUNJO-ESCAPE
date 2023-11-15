@@ -6,30 +6,16 @@ using UnityEngine.Rendering;
 
 public class GroundPound : MonoBehaviour
 {
-    private NEWPlayerMovement pm;//THIS IS OUR PLAYER MOVEMENT SCRIPT (pm = Player Movement)
-    [SerializeField]private Rigidbody2D rb;
-    [SerializeField] private bool doGroundPound;
-    [SerializeField] private float dropForce = 5f;
-    [SerializeField] private float stopTime = 0.5f;
-    [SerializeField] private float gravityScale = 1f;
+    private PlayerMovementManager pm;//THIS IS OUR PLAYER MOVEMENT SCRIPT (pm = Player Movement)
+    private Dash d;
 
-    private bool isGroundpounding = false;
+    [SerializeField] public Rigidbody2D rb;
+
+    public bool isGroundpounding = false;
         private void Awake()
         {
-            pm = GetComponent<NEWPlayerMovement>();
-        }
-
-        private void FixedUpdate()
-        {
-            if(!pm.isWallJumping)
-            {
-                if(doGroundPound && !isGroundpounding)
-                {
-                    GroundPoundAttack();
-                }
-                doGroundPound = false;
-            }
-            
+            pm = GetComponent<PlayerMovementManager>();
+            d = GetComponent<Dash>();
         }
 
     public void PoundInput(InputAction.CallbackContext context)
@@ -38,12 +24,12 @@ public class GroundPound : MonoBehaviour
         {
             if(!pm.IsGrounded())
             {
-                doGroundPound = true;
+                pm.doGroundPound = true;
             }
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D other)
+    public void OnCollisionEnter2D(Collision2D other)
     {
         if(other.contacts[0].normal.y > 0.5)
         {
@@ -51,39 +37,41 @@ public class GroundPound : MonoBehaviour
         }
     }
 
-    private void GroundPoundAttack()
+    public void GroundPoundAttack()
     {
         pm.enabled = false;
         StopAndSpin();
         StartCoroutine("DropAndSmash");
     }
 
-    private void StopAndSpin()
+    public void StopAndSpin()
     {
         isGroundpounding = true;
         pm.canDash = false;
         pm.doubleJump = false;
+        pm.speed = 0f;
         ClearForces();  
         rb.gravityScale = 0;
         //we can change how we freeze our position here 
     }
 
-    private IEnumerator DropAndSmash()
+    public IEnumerator DropAndSmash()
     {
-        yield return new WaitForSeconds(stopTime);
-        rb.AddForce(Vector2.down * dropForce, ForceMode2D.Impulse);
+        yield return new WaitForSeconds(pm.stopTime);
+        rb.AddForce(Vector2.down * pm.dropForce, ForceMode2D.Impulse);
     }
 
-    private void CompleteGroundPound()
+    public void CompleteGroundPound()
     {
-        rb.gravityScale = gravityScale;
+        rb.gravityScale = pm.gravityScale;
         pm.enabled = true;
         isGroundpounding = false;
         pm.canDash = true;
         pm.doubleJump = true;
+        pm.speed = 20f;
     }
 
-    private void ClearForces()
+    public void ClearForces()
     {
         rb.velocity = Vector2.zero;
         rb.angularVelocity = 0;
