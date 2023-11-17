@@ -105,10 +105,10 @@ public class PlayerMovementManager : MonoBehaviour
             cannotTurnForTimer -= Time.deltaTime;
         }
         
-        if(!isWallSliding && wallJumpingCounter > 0f)
-        {
-            Flip();
-        }
+        // if(!isWallSliding && wallJumpingCounter > 0f)
+        // {
+        //     Flip();
+        // }
 
         if (!isWallJumping)
         {

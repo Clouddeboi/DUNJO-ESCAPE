@@ -52,8 +52,7 @@ public class Jump : MonoBehaviour
         }
         
         if (pm.isWallSliding)
-        {
-            
+        {            
             pm.isWallJumping = false;
             pm.wallJumpingDirection = -transform.localScale.x;
             pm.wallJumpingCounter = pm.wallJumpingTime;

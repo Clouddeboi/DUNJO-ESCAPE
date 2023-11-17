@@ -51,7 +51,7 @@ public class GroundPound : MonoBehaviour
         pm.doubleJump = false;
         pm.speed = 0f;
         ClearForces();  
-        rb.gravityScale = 0;
+        //rb.gravityScale = 0;
         //we can change how we freeze our position here 
     }
 
