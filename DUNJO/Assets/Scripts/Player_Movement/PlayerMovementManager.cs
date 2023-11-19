@@ -60,13 +60,15 @@ public class PlayerMovementManager : MonoBehaviour
     public float dashingPower = 20f;//dashing power
     public float dashingTime = 0.2f;//time spent dashing
     public float dashingCooldown = 2f;//cooldown of dash ability
+    public float WaitTime;
+    public float dashGravity = 0f;
     public TrailRenderer tr;
 
     [Header("Ground Pound Variables")]
     public bool doGroundPound;
     public float dropForce = 5f;
     public float stopTime = 0.5f;
-    public float gravityScale = 1f;
+    public float gravityScale = 10f;
 
     private void Awake()
     {
@@ -79,29 +81,11 @@ public class PlayerMovementManager : MonoBehaviour
 
     void Update()
     {
-        J.WallSlide();
-        J.WallJump();
-        // if (isWallSliding)
-        // {           
-        //     isWallJumping = false;
-        //     wallJumpingDirection = -transform.localScale.x;
-        //     wallJumpingCounter = wallJumpingTime;
-        //     //pm.cannotTurnForTimer = pm.wallJumpingDuration;
-
-        //     CancelInvoke(nameof(J.StopWallJumping));
-        // }
-        // else
-        // {
-        //     wallJumpingCounter -= Time.deltaTime;
-        // }
-        // if(isWallSliding)
-        // {
-        //     Flip();
-        // }
-        // if(isWallJumping)
-        // {
-        //     Flip();
-        // }
+        WaitTime += Time.deltaTime;
+        if (isDashing)
+        {
+            return;
+        } 
     }
 
     private void FixedUpdate()
@@ -112,18 +96,10 @@ public class PlayerMovementManager : MonoBehaviour
             doubleJump = true;
             isWallJumping = false;
             wallJumpingCounter = 0f;
-            //cannotTurnForTimer = 0f;
         }
 
-        // else 
-        // {
-        //     cannotTurnForTimer -= Time.deltaTime;
-        // }
-        
-        // if(!isWallSliding && wallJumpingCounter > 0f)
-        // {
-        //     Flip();
-        // }
+        J.WallSlide();
+        J.WallJump();
 
         if (!isWallJumping)
         {
@@ -174,21 +150,6 @@ public class PlayerMovementManager : MonoBehaviour
     public void Move(InputAction.CallbackContext context)
     {
         horizontal = context.ReadValue<Vector2>().x;
-
-        // if (horizontal > 0f)
-        // {
-        //     if (!isFacingRight)
-        //     {
-        //         Flip();
-        //     }
-        // }
-        // else if (horizontal < 0f)
-        // {
-        //     if (isFacingRight)
-        //     {
-        //         Flip();
-        //     }
-        // }
     }
 
 }

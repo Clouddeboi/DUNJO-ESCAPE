@@ -17,28 +17,48 @@ public class Dash : MonoBehaviour
 
     public void DashInput(InputAction.CallbackContext context)
     {
-        if (context.performed && pm.canDash && !pm.isDashing)
+        if (context.performed && pm.canDash)
         {
             //AudioManager.PlaySFX(AudioManager.Dash);
-            StartCoroutine(DoDash());
+            if(pm.WaitTime >= pm.dashingCooldown)
+            {
+                pm.WaitTime = 0f;
+                Invoke("Dashing",0);
+            }
         }
     }
+    
 
-    private IEnumerator DoDash()
+    public void Dashing()
     {
         pm.canDash = false;
         pm.isDashing = true;
-        pm.playerSprite.color = new Color(pm.playerSprite.color.r * 4, pm.playerSprite.color.g * 2, pm.playerSprite.color.b * 2);
-        float originalGravity = rb.gravityScale;//this is because we dont want our player to be affected by gravity while dashing
-        rb.gravityScale = 0f;//variable that stores gravity since we want to apply concept above^
-        rb.velocity = new Vector2(transform.localScale.x * pm.dashingPower, 0f);//indicates direction player is facing
-        pm.tr.emitting = true;//emits trail
-        yield return new WaitForSeconds(pm.dashingTime);//stop dashing for a few secs
-        pm.tr.emitting = false;//trail emitting off
-        rb.gravityScale = originalGravity;//sets gravity back to original
-        pm.isDashing = false;//we cant dash
-        yield return new WaitForSeconds(pm.dashingCooldown);//waits for a few seconds(correspondng to dashing cooldown)
-        pm.canDash = true;//sets can dash back to true afterwards
-        pm.playerSprite.color = pm.ogPlayerColour;
+        pm.tr.emitting = true;
+        rb.gravityScale = pm.dashGravity;
+
+        if(pm.horizontal == 0)
+        {
+            if(pm.isFacingRight)
+            {
+                rb.velocity = new Vector2(transform.localScale.x * pm.dashingPower,0);
+            }
+            if(!pm.isFacingRight)
+            {
+                rb.velocity = new Vector2(transform.localScale.x * pm.dashingPower,0);
+            }
+        }
+        else
+        {
+            rb.velocity = new Vector2(pm.horizontal * pm.dashingPower,0);
+        }
+        Invoke("StopDash",pm.dashingTime);
+    }
+
+    public void StopDash()
+    {
+        pm.canDash = true;
+        pm.isDashing = false;
+        pm.tr.emitting = false;
+        rb.gravityScale = pm.gravityScale;
     }
 }

@@ -52,12 +52,12 @@ public class Jump : MonoBehaviour
             pm.coyoteTimeCounter = 0f;
         }
 
-         if (context.performed && pm.wallJumpingCounter > 0f)
-         {
+        if (context.performed && pm.wallJumpingCounter > 0f)
+        {
             pm.WallJumpInputPressed = true;
             WallJump();
             pm.WallJumpInputPressed = false;
-         }
+        }
     }
 
     public void WallJump()
@@ -97,12 +97,14 @@ public class Jump : MonoBehaviour
     {
         if(pm.IsWalled() && !pm.IsGrounded() && pm.horizontal != 0f)//if we arent on the ground and we are at a wall set wall sliding to true
         {
+            pm.canDash = false;
             pm.Flip();
             pm.isWallSliding = true;
             rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -pm.WallSlidingSpeed, float.MaxValue));
         }
         else 
         {
+            pm.canDash = true;
             pm.isWallSliding = false;//else set to false
         }
    }
