@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Tilemaps;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
@@ -50,13 +51,22 @@ public class Jump : MonoBehaviour
 
             pm.coyoteTimeCounter = 0f;
         }
-        
+
+         if (context.performed && pm.wallJumpingCounter > 0f)
+         {
+            pm.WallJumpInputPressed = true;
+            WallJump();
+            pm.WallJumpInputPressed = false;
+         }
+    }
+
+    public void WallJump()
+    {
         if (pm.isWallSliding)
-        {            
+        {
             pm.isWallJumping = false;
             pm.wallJumpingDirection = -transform.localScale.x;
             pm.wallJumpingCounter = pm.wallJumpingTime;
-            pm.cannotTurnForTimer = pm.wallJumpingDuration;
 
             CancelInvoke(nameof(StopWallJumping));
         }
@@ -65,16 +75,19 @@ public class Jump : MonoBehaviour
             pm.wallJumpingCounter -= Time.deltaTime;
         }
 
-        if (context.performed && pm.wallJumpingCounter > 0f)
+        if (pm.WallJumpInputPressed && pm.wallJumpingCounter > 0f)
         {
-            if (pm.isWallSliding) 
-            {
-                pm.Flip();
-            }
-
             pm.isWallJumping = true;
             rb.velocity = new Vector2(pm.wallJumpingDirection * pm.wallJumpingPower.x, pm.wallJumpingPower.y);
             pm.wallJumpingCounter = 0f;
+
+            if (transform.localScale.x != pm.wallJumpingDirection)
+            {
+                pm.isFacingRight = !pm.isFacingRight;
+                Vector3 localScale = transform.localScale;
+                localScale.x *= -1f;
+                transform.localScale = localScale;
+            }
 
             Invoke(nameof(StopWallJumping), pm.wallJumpingDuration);
         }
@@ -84,6 +97,7 @@ public class Jump : MonoBehaviour
     {
         if(pm.IsWalled() && !pm.IsGrounded() && pm.horizontal != 0f)//if we arent on the ground and we are at a wall set wall sliding to true
         {
+            pm.Flip();
             pm.isWallSliding = true;
             rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -pm.WallSlidingSpeed, float.MaxValue));
         }

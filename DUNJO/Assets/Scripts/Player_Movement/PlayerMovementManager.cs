@@ -21,7 +21,7 @@ public class PlayerMovementManager : MonoBehaviour
     [Header("Sprite Settings")]
     public SpriteRenderer playerSprite;
     public Color ogPlayerColour;
-    [SerializeField] private bool isFacingRight = true;
+    [SerializeField] public bool isFacingRight = true;
 
     [Header("Jump Settings")]
 
@@ -52,13 +52,14 @@ public class PlayerMovementManager : MonoBehaviour
     public bool isWallSliding;//indicates wall climbing
     public bool isWallJumping;//indicates if player is wall jumping
     public bool isWalled;
+    public bool WallJumpInputPressed;
 
     [Header("Dash Variables")]
     public bool canDash = true;//determines if player can dash
     public bool isDashing;//determines if player is already dashing
     public float dashingPower = 20f;//dashing power
     public float dashingTime = 0.2f;//time spent dashing
-    public float dashingCooldown = 1f;//cooldown of dash ability
+    public float dashingCooldown = 2f;//cooldown of dash ability
     public TrailRenderer tr;
 
     [Header("Ground Pound Variables")]
@@ -79,31 +80,45 @@ public class PlayerMovementManager : MonoBehaviour
     void Update()
     {
         J.WallSlide();
+        J.WallJump();
+        // if (isWallSliding)
+        // {           
+        //     isWallJumping = false;
+        //     wallJumpingDirection = -transform.localScale.x;
+        //     wallJumpingCounter = wallJumpingTime;
+        //     //pm.cannotTurnForTimer = pm.wallJumpingDuration;
+
+        //     CancelInvoke(nameof(J.StopWallJumping));
+        // }
+        // else
+        // {
+        //     wallJumpingCounter -= Time.deltaTime;
+        // }
+        // if(isWallSliding)
+        // {
+        //     Flip();
+        // }
+        // if(isWallJumping)
+        // {
+        //     Flip();
+        // }
     }
 
     private void FixedUpdate()
     {
-        if (!isFacingRight && horizontal > 0f && cannotTurnForTimer <= 0f)
-        {
-            Flip();
-        }
-        else if (isFacingRight && horizontal < 0f && cannotTurnForTimer <= 0f)
-        {
-            Flip();
-        }
 
         if(IsGrounded())
         {
             doubleJump = true;
             isWallJumping = false;
             wallJumpingCounter = 0f;
-            cannotTurnForTimer = 0f;
+            //cannotTurnForTimer = 0f;
         }
 
-        else 
-        {
-            cannotTurnForTimer -= Time.deltaTime;
-        }
+        // else 
+        // {
+        //     cannotTurnForTimer -= Time.deltaTime;
+        // }
         
         // if(!isWallSliding && wallJumpingCounter > 0f)
         // {
@@ -112,6 +127,14 @@ public class PlayerMovementManager : MonoBehaviour
 
         if (!isWallJumping)
         {
+            if (!isFacingRight && horizontal > 0f)
+            {
+                Flip();
+            }
+            else if (isFacingRight && horizontal < 0f)
+            {
+                Flip();
+            }
             if (isDashing)
             {
                 return;
@@ -124,6 +147,8 @@ public class PlayerMovementManager : MonoBehaviour
 
             rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
         }
+
+
     }
 
     public bool IsGrounded()
@@ -150,20 +175,20 @@ public class PlayerMovementManager : MonoBehaviour
     {
         horizontal = context.ReadValue<Vector2>().x;
 
-        if (horizontal > 0f)
-        {
-            if (!isFacingRight)
-            {
-                Flip();
-            }
-        }
-        else if (horizontal < 0f)
-        {
-            if (isFacingRight)
-            {
-                Flip();
-            }
-        }
+        // if (horizontal > 0f)
+        // {
+        //     if (!isFacingRight)
+        //     {
+        //         Flip();
+        //     }
+        // }
+        // else if (horizontal < 0f)
+        // {
+        //     if (isFacingRight)
+        //     {
+        //         Flip();
+        //     }
+        // }
     }
 
 }

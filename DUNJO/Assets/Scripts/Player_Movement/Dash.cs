@@ -15,16 +15,16 @@ public class Dash : MonoBehaviour
         pm = GetComponent<PlayerMovementManager>();
     }
 
-    public void doDash(InputAction.CallbackContext context)
+    public void DashInput(InputAction.CallbackContext context)
     {
-        if (pm.canDash)
+        if (context.performed && pm.canDash && !pm.isDashing)
         {
             //AudioManager.PlaySFX(AudioManager.Dash);
-            StartCoroutine(doDash());
+            StartCoroutine(DoDash());
         }
     }
 
-    private IEnumerator doDash()
+    private IEnumerator DoDash()
     {
         pm.canDash = false;
         pm.isDashing = true;

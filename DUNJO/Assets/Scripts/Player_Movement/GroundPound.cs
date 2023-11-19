@@ -12,11 +12,11 @@ public class GroundPound : MonoBehaviour
     [SerializeField] public Rigidbody2D rb;
 
     public bool isGroundpounding = false;
-        private void Awake()
-        {
-            pm = GetComponent<PlayerMovementManager>();
-            d = GetComponent<Dash>();
-        }
+    private void Awake()
+    {
+        pm = GetComponent<PlayerMovementManager>();
+        d = GetComponent<Dash>();
+    }
 
     public void PoundInput(InputAction.CallbackContext context)
     {
