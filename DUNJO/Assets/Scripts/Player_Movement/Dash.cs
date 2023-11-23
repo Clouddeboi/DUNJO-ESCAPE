@@ -20,9 +20,9 @@ public class Dash : MonoBehaviour
         if (context.performed && pm.canDash)
         {
             //AudioManager.PlaySFX(AudioManager.Dash);
-            if(pm.WaitTime >= pm.dashingCooldown)
+            if(pm.WaitTimeDash >= pm.dashingCooldown)
             {
-                pm.WaitTime = 0f;
+                pm.WaitTimeDash = 0f;
                 Invoke("Dashing",0);
             }
         }
@@ -36,7 +36,7 @@ public class Dash : MonoBehaviour
         pm.tr.emitting = true;
         rb.gravityScale = pm.dashGravity;
 
-        if(pm.horizontal == 0)
+        if(pm.horizontal == 0 || pm.horizontal == 1 || pm.horizontal == -1)
         {
             if(pm.isFacingRight)
             {

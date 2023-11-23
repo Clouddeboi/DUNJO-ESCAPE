@@ -29,10 +29,12 @@ public class Jump : MonoBehaviour
 
         if(context.performed)
         {
+            pm.dust.Play();
             pm.jumpBufferCounter = pm.jumpBufferTime;
         }
         else
         {
+            pm.dust.Play();
             pm.jumpBufferCounter -= Time.deltaTime;
         }
 
@@ -64,6 +66,7 @@ public class Jump : MonoBehaviour
     {
         if (pm.isWallSliding)
         {
+            //pm.dust.Play();
             pm.isWallJumping = false;
             pm.wallJumpingDirection = -transform.localScale.x;
             pm.wallJumpingCounter = pm.wallJumpingTime;

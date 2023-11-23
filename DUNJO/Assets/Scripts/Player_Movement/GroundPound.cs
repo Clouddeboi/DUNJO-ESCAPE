@@ -20,13 +20,22 @@ public class GroundPound : MonoBehaviour
 
     public void PoundInput(InputAction.CallbackContext context)
     {
-        if(context.performed)
-        {
-            if(!pm.IsGrounded())
+            if(context.performed)
             {
-                pm.doGroundPound = true;
+                if(!pm.IsGrounded() && pm.WaitTimeGP >= pm.GroundPoundCooldown)
+                {
+                    pm.WaitTimeGP = 0f;
+                    pm.doGroundPound = true;
+                }
             }
-        }
+        
+        // else if(context.canceled)
+        // {
+        //     if(!pm.IsGrounded() && pm.WaitTimeGP <= pm.GroundPoundCooldown)
+        //     {
+        //         pm.doGroundPound = false;
+        //     }
+        // }
     }
 
     public void OnCollisionEnter2D(Collision2D other)
@@ -35,6 +44,10 @@ public class GroundPound : MonoBehaviour
         {
             CompleteGroundPound();
         }
+        // if(collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Wall")|| collision.gameObject.CompareTag("JumpPad") || collision.gameObject.CompareTag("Platform"))
+        // {
+        //     CompleteGroundPound();
+        // }
     }
 
     public void GroundPoundAttack()

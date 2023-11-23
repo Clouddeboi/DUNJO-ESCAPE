@@ -37,6 +37,7 @@ public class PlayerMovementManager : MonoBehaviour
     [Header("Movement Variables")]
     public float horizontal;
     public float speed = 20f;
+    public ParticleSystem dust;
 
     [Header("Wall-Jumping+Sliding Variables")]
 
@@ -60,7 +61,7 @@ public class PlayerMovementManager : MonoBehaviour
     public float dashingPower = 20f;//dashing power
     public float dashingTime = 0.2f;//time spent dashing
     public float dashingCooldown = 2f;//cooldown of dash ability
-    public float WaitTime;
+    public float WaitTimeDash;
     public float dashGravity = 0f;
     public TrailRenderer tr;
 
@@ -69,6 +70,8 @@ public class PlayerMovementManager : MonoBehaviour
     public float dropForce = 5f;
     public float stopTime = 0.5f;
     public float gravityScale = 10f;
+    public float GroundPoundCooldown = 0.5f;
+    public float WaitTimeGP;
 
     private void Awake()
     {
@@ -81,7 +84,8 @@ public class PlayerMovementManager : MonoBehaviour
 
     void Update()
     {
-        WaitTime += Time.deltaTime;
+        WaitTimeDash += Time.deltaTime;
+        WaitTimeGP += Time.deltaTime;
         if (isDashing)
         {
             return;
@@ -145,6 +149,11 @@ public class PlayerMovementManager : MonoBehaviour
         Vector3 localScale = transform.localScale;
         localScale.x *= -1f;
         transform.localScale = localScale;
+
+        if(IsGrounded())
+        {
+           dust.Play(); 
+        }
     }
 
     public void Move(InputAction.CallbackContext context)

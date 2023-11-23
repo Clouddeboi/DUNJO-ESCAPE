@@ -5,12 +5,17 @@ using UnityEngine;
 public class JumpPad : MonoBehaviour
 {
     [SerializeField ]private float bounce = 30f;
+    private PlayerMovementManager pm;
+    private GroundPound GP;
+    
     //AudioManager AudioManager;
 
-    // private void Awake()
-    // {
-    //     //AudioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
-    // }
+    private void Awake()
+    {
+        //AudioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+        pm = GetComponent<PlayerMovementManager>();
+        GP = GetComponent<GroundPound>();
+    }
 
     private void OnCollisionEnter2D(Collision2D collision)//check if something collided with object
     {
