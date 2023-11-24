@@ -58,7 +58,7 @@ public class PlayerMovementManager : MonoBehaviour
     [Header("Dash Variables")]
     public bool canDash = true;//determines if player can dash
     public bool isDashing;//determines if player is already dashing
-    public float dashingPower = 20f;//dashing power
+    public float dashingPower = 40f;//dashing power
     public float dashingTime = 0.2f;//time spent dashing
     public float dashingCooldown = 2f;//cooldown of dash ability
     public float WaitTimeDash;
@@ -101,6 +101,12 @@ public class PlayerMovementManager : MonoBehaviour
             isWallJumping = false;
             wallJumpingCounter = 0f;
         }
+        // if(!IsWalled())
+        // {
+        //     isWalled = false;
+        //     //isWallJumping = false;
+        //     isWallSliding = false;
+        // }
 
         J.WallSlide();
         J.WallJump();

@@ -101,7 +101,7 @@ public class Jump : MonoBehaviour
         if(pm.IsWalled() && !pm.IsGrounded() && pm.horizontal != 0f)//if we arent on the ground and we are at a wall set wall sliding to true
         {
             pm.canDash = false;
-            pm.Flip();
+            //pm.Flip();
             pm.isWallSliding = true;
             rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -pm.WallSlidingSpeed, float.MaxValue));
         }
