@@ -62,6 +62,15 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""WallJump"",
+                    ""type"": ""Button"",
+                    ""id"": ""658a27f9-4359-4f8f-a0c1-5e3b6d59ea4b"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -284,6 +293,50 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
                     ""action"": ""GroundPound"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""240571b5-994e-478c-b4d2-e9494fbad7a3"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""WallJump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""673ead90-98b7-418a-ab8d-dd4a0ad21734"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""WallJump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""712c4573-0f9d-4bd6-bb37-b9046e643a06"",
+                    ""path"": ""<Gamepad>/dpad/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""WallJump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""684f2760-221f-444c-97da-add0def7a826"",
+                    ""path"": ""<Keyboard>/upArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""WallJump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -296,6 +349,7 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
         m_Player_GroundPound = m_Player.FindAction("GroundPound", throwIfNotFound: true);
+        m_Player_WallJump = m_Player.FindAction("WallJump", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -361,6 +415,7 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Dash;
     private readonly InputAction m_Player_GroundPound;
+    private readonly InputAction m_Player_WallJump;
     public struct PlayerActions
     {
         private @CustomInput m_Wrapper;
@@ -369,6 +424,7 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @Dash => m_Wrapper.m_Player_Dash;
         public InputAction @GroundPound => m_Wrapper.m_Player_GroundPound;
+        public InputAction @WallJump => m_Wrapper.m_Player_WallJump;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -390,6 +446,9 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
             @GroundPound.started += instance.OnGroundPound;
             @GroundPound.performed += instance.OnGroundPound;
             @GroundPound.canceled += instance.OnGroundPound;
+            @WallJump.started += instance.OnWallJump;
+            @WallJump.performed += instance.OnWallJump;
+            @WallJump.canceled += instance.OnWallJump;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -406,6 +465,9 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
             @GroundPound.started -= instance.OnGroundPound;
             @GroundPound.performed -= instance.OnGroundPound;
             @GroundPound.canceled -= instance.OnGroundPound;
+            @WallJump.started -= instance.OnWallJump;
+            @WallJump.performed -= instance.OnWallJump;
+            @WallJump.canceled -= instance.OnWallJump;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -429,5 +491,6 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnDash(InputAction.CallbackContext context);
         void OnGroundPound(InputAction.CallbackContext context);
+        void OnWallJump(InputAction.CallbackContext context);
     }
 }

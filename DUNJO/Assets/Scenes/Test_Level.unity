@@ -1355,7 +1355,6 @@ MonoBehaviour:
   WallSlidingSpeed: 2
   wallJumpingTime: 0.2
   wallJumpingCounter: 0
-  cannotTurnForTimer: 0
   wallJumpingDuration: 0.4
   wallJumpingPower: {x: 20, y: 30}
   wallcheck: {fileID: 277923729}
@@ -1470,6 +1469,10 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: e0713008-0f32-4c2a-bad5-5e40e1e672e1
     m_ActionName: Player/GroundPound[/XInputControllerWindows/buttonEast,/Keyboard/f]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 658a27f9-4359-4f8f-a0c1-5e3b6d59ea4b
+    m_ActionName: Player/WallJump[/Keyboard/space,/Keyboard/upArrow]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -1501,6 +1504,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3e9e10e0c56f5142af506fd9e5259af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isJumping: 0
   rb: {fileID: 356130259}
 --- !u!114 &356130267
 MonoBehaviour:
@@ -25373,8 +25377,8 @@ MonoBehaviour:
   m_ShadowVolumeIntensityEnabled: 0
   m_ShadowVolumeIntensity: 0.75
   m_LocalBounds:
-    m_Center: {x: 3.493, y: 0.00029993057, z: 0}
-    m_Extent: {x: 5.4993, y: 2.0086, z: 0}
+    m_Center: {x: 3.5013502, y: 0.00064998865, z: 0}
+    m_Extent: {x: 5.50105, y: 1.99805, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0

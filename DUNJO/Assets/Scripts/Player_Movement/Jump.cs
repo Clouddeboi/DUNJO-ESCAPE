@@ -8,6 +8,7 @@ using UnityEngine.Rendering;
 public class Jump : MonoBehaviour
 {
     private PlayerMovementManager pm;
+    public bool isJumping;
     [SerializeField] private Rigidbody2D rb;
 
     private void Awake() 
@@ -38,12 +39,12 @@ public class Jump : MonoBehaviour
             pm.jumpBufferCounter -= Time.deltaTime;
         }
 
-        if (pm.jumpBufferCounter > 0f && pm.coyoteTimeCounter > 0f || pm.jumpBufferCounter > 0f && pm.doubleJump)
+        if (pm.jumpBufferCounter > 0f && pm.coyoteTimeCounter > 0f  && !isJumping || pm.jumpBufferCounter > 0f && pm.doubleJump && !isJumping)
         {
             rb.velocity = new Vector2(rb.velocity.x, pm.jumpingPower);
 
             pm.jumpBufferCounter = 0f;
-
+            
             pm.doubleJump = !pm.doubleJump;
         }
 
@@ -52,13 +53,20 @@ public class Jump : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
 
             pm.coyoteTimeCounter = 0f;
+            
         }
 
-        if (context.performed && pm.wallJumpingCounter > 0f)
+
+        //AHHHHHH WHY IS THERE NEW BUGS (WE WILL NEED TO REFACTOR WALL JUMPING INTO ITS OWN SCRIPT :((((((((((( ILL GWT IT DONE TMRW WILL PROB SOLVE A LOT OF ISSUES IN GENERAL ANYWAYS)
+
+        if (pm.isWalled)
         {
-            pm.WallJumpInputPressed = true;
-            WallJump();
-            pm.WallJumpInputPressed = false;
+            if(context.performed && pm.wallJumpingCounter > 0f)
+            {
+                pm.WallJumpInputPressed = true;
+                WallJump();
+                pm.WallJumpInputPressed = false;
+            }
         }
     }
 
@@ -66,7 +74,6 @@ public class Jump : MonoBehaviour
     {
         if (pm.isWallSliding)
         {
-            //pm.dust.Play();
             pm.isWallJumping = false;
             pm.wallJumpingDirection = -transform.localScale.x;
             pm.wallJumpingCounter = pm.wallJumpingTime;
@@ -115,6 +122,13 @@ public class Jump : MonoBehaviour
     public void StopWallJumping()
     {
         pm.isWallJumping = false;
+    }
+
+    public IEnumerator JumpCooldown()
+    {
+        isJumping = true;
+        yield return new WaitForSeconds(0.4f);
+        isJumping = false;
     }
 
 }

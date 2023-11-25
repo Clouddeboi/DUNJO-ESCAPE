@@ -44,7 +44,7 @@ public class PlayerMovementManager : MonoBehaviour
     public float WallSlidingSpeed = 2f;
     public float wallJumpingTime = 0.2f;//time wall jumping
     public float wallJumpingCounter;//wall jump counter
-    public float cannotTurnForTimer = 0f; //Timer that counts down from wallJumpingTime, once at 0f the player can do input
+    //public float cannotTurnForTimer = 0f; //Timer that counts down from wallJumpingTime, once at 0f the player can do input
     public float wallJumpingDuration = 0.4f;//wall jumping duration
     public Vector2 wallJumpingPower = new Vector2(8f, 16f);//power of wall jump
     public Transform wallcheck;
@@ -101,12 +101,6 @@ public class PlayerMovementManager : MonoBehaviour
             isWallJumping = false;
             wallJumpingCounter = 0f;
         }
-        // if(!IsWalled())
-        // {
-        //     isWalled = false;
-        //     //isWallJumping = false;
-        //     isWallSliding = false;
-        // }
 
         J.WallSlide();
         J.WallJump();
