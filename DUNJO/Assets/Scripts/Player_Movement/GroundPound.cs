@@ -8,6 +8,7 @@ public class GroundPound : MonoBehaviour
 {
     private PlayerMovementManager pm;//THIS IS OUR PLAYER MOVEMENT SCRIPT (pm = Player Movement)
     private Dash d;
+    private Jump J;
 
     [SerializeField] public Rigidbody2D rb;
 
@@ -16,6 +17,7 @@ public class GroundPound : MonoBehaviour
     {
         pm = GetComponent<PlayerMovementManager>();
         d = GetComponent<Dash>();
+        J = GetComponent<Jump>();
     }
 
     public void PoundInput(InputAction.CallbackContext context)
@@ -29,13 +31,6 @@ public class GroundPound : MonoBehaviour
                 }
             }
         
-        // else if(context.canceled)
-        // {
-        //     if(!pm.IsGrounded() && pm.WaitTimeGP <= pm.GroundPoundCooldown)
-        //     {
-        //         pm.doGroundPound = false;
-        //     }
-        // }
     }
 
     public void OnCollisionEnter2D(Collision2D other)
@@ -44,10 +39,7 @@ public class GroundPound : MonoBehaviour
         {
             CompleteGroundPound();
         }
-        // if(collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Wall")|| collision.gameObject.CompareTag("JumpPad") || collision.gameObject.CompareTag("Platform"))
-        // {
-        //     CompleteGroundPound();
-        // }
+
     }
 
     public void GroundPoundAttack()
@@ -61,7 +53,8 @@ public class GroundPound : MonoBehaviour
     {
         isGroundpounding = true;
         pm.canDash = false;
-        pm.doubleJump = false;
+        pm.jumpsRemaining =0;
+        //pm.doubleJump = false;
         pm.speed = 0f;
         ClearForces();  
         //rb.gravityScale = 0;
@@ -80,7 +73,7 @@ public class GroundPound : MonoBehaviour
         pm.enabled = true;
         isGroundpounding = false;
         pm.canDash = true;
-        pm.doubleJump = true;
+        //pm.doubleJump = true;
         pm.speed = 20f;
     }
 

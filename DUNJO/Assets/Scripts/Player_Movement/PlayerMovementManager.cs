@@ -22,9 +22,8 @@ public class PlayerMovementManager : MonoBehaviour
     public SpriteRenderer playerSprite;
     public Color ogPlayerColour;
     [SerializeField] public bool isFacingRight = true;
-
+  
     [Header("Jump Settings")]
-
     private bool isGrounded;
     public float coyoteTime = 0.2f;
     public float coyoteTimeCounter;
@@ -32,12 +31,21 @@ public class PlayerMovementManager : MonoBehaviour
     public float jumpBufferCounter;
     public float jumpingPower = 30f;
     public bool doubleJump;
+    public int jumpsRemaining;
+    public int maxJumps =2;
+
+    // [Header("Gravity")]
+    // public float baseGravity = 10f;
+    // public float maxFallSpeed =15f;
+    // public float fallSpeedMultiplier = 3f;
 
 
     [Header("Movement Variables")]
     public float horizontal;
     public float speed = 20f;
     public ParticleSystem dust;
+    public float acceleration;
+    public float maxSpeedChange;
 
     [Header("Wall-Jumping+Sliding Variables")]
 
@@ -97,13 +105,15 @@ public class PlayerMovementManager : MonoBehaviour
 
         if(IsGrounded())
         {
-            doubleJump = true;
+            //doubleJump = true;
             isWallJumping = false;
             wallJumpingCounter = 0f;
         }
 
         J.WallSlide();
         J.WallJump();
+        RefreshJump();
+        //Gravity();
 
         if (!isWallJumping)
         {
@@ -136,6 +146,27 @@ public class PlayerMovementManager : MonoBehaviour
         /* MAYBE DELETE THESE AFTER? */isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.5f, groundLayer);
         return isGrounded;
     }
+
+    public void RefreshJump()
+    {
+        if(Physics2D.OverlapCircle(groundCheck.position, 0.5f, groundLayer))
+        {
+            jumpsRemaining = maxJumps;
+        }
+    }
+
+    // public void Gravity()
+    // {
+    //     if(rb.velocity.y < 0)
+    //     {
+    //         rb.gravityScale = baseGravity * fallSpeedMultiplier;
+    //         rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y, -maxFallSpeed));
+    //     }
+    //     else
+    //     {
+    //         rb.gravityScale = baseGravity;
+    //     }
+    // }
 
     public bool IsWalled()
     {

@@ -18,44 +18,45 @@ public class Jump : MonoBehaviour
 
     public void JumpButton(InputAction.CallbackContext context)
     {
-        if(pm.IsGrounded())
+        if(pm.jumpsRemaining > 0)
         {
             pm.coyoteTimeCounter = pm.coyoteTime;
-            pm.doubleJump = false;
+            //pm.doubleJump = false;
+            if(context.performed)
+            {
+                pm.dust.Play();
+                pm.jumpBufferCounter = pm.jumpBufferTime;
+            }
+            else
+            {
+                pm.dust.Play();
+                pm.jumpBufferCounter -= Time.deltaTime;
+            }
+
+            if (context.performed && pm.coyoteTimeCounter > 0f && pm.jumpBufferCounter > 0f)
+            {
+                rb.velocity = new Vector2(rb.velocity.x, pm.jumpingPower);
+
+                pm.jumpBufferCounter = 0f;
+
+                pm.jumpsRemaining--;
+                
+                //pm.doubleJump = !pm.doubleJump;
+            }
+
+            if (context.canceled)
+            {
+                rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+
+                pm.coyoteTimeCounter = 0f;
+
+                pm.jumpsRemaining--;
+            }
         }
         else
         {
             pm.coyoteTimeCounter -= Time.deltaTime;
         }
-
-        if(context.performed)
-        {
-            pm.dust.Play();
-            pm.jumpBufferCounter = pm.jumpBufferTime;
-        }
-        else
-        {
-            pm.dust.Play();
-            pm.jumpBufferCounter -= Time.deltaTime;
-        }
-
-        if (pm.jumpBufferCounter > 0f && pm.coyoteTimeCounter > 0f  && !isJumping || pm.jumpBufferCounter > 0f && pm.doubleJump && !isJumping)
-        {
-            rb.velocity = new Vector2(rb.velocity.x, pm.jumpingPower);
-
-            pm.jumpBufferCounter = 0f;
-            
-            pm.doubleJump = !pm.doubleJump;
-        }
-
-        if (context.canceled && rb.velocity.y > 0f)
-        {
-            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
-
-            pm.coyoteTimeCounter = 0f;
-            
-        }
-
 
         //AHHHHHH WHY IS THERE NEW BUGS (WE WILL NEED TO REFACTOR WALL JUMPING INTO ITS OWN SCRIPT :((((((((((( ILL GWT IT DONE TMRW WILL PROB SOLVE A LOT OF ISSUES IN GENERAL ANYWAYS)
 
@@ -124,11 +125,11 @@ public class Jump : MonoBehaviour
         pm.isWallJumping = false;
     }
 
-    public IEnumerator JumpCooldown()
-    {
-        isJumping = true;
-        yield return new WaitForSeconds(0.4f);
-        isJumping = false;
-    }
+    // public IEnumerator JumpCooldown()
+    // {
+    //     isJumping = true;
+    //     yield return new WaitForSeconds(0.4f);
+    //     isJumping = false;
+    // }
 
 }
